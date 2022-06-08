@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
+import 'package:rebusel/screen/login_screen.dart';
 
 class IntroDuctionScreen extends StatelessWidget {
   const IntroDuctionScreen({Key? key}) : super(key: key);
@@ -60,10 +61,12 @@ class IntroDuctionScreen extends StatelessWidget {
               ),
             ),
             SizedBox(
-              height: 30,
+              height: 70,
             ),
             GestureDetector(
-              onTap: (){},
+              onTap: (){
+                Navigator.push(context, MaterialPageRoute(builder: (_)=> LoginScreen()));
+              },
               child: Center(
                 child: Container(
                   alignment: Alignment.center,

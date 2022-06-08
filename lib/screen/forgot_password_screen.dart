@@ -1,32 +1,26 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:http/http.dart' as http;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:hexcolor/hexcolor.dart';
-import 'package:http/http.dart' as http;
-import 'package:rebusel/screen/forgot_password_screen.dart';
-import 'package:rebusel/utils/my_pref.dart';
+import 'package:rebusel/model/forgot_password_model.dart';
 
-import '../model/login_model.dart';
-import 'chat_screen.dart';
+import 'login_screen.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({Key? key}) : super(key: key);
+class ForgotPasswordScreen extends StatefulWidget {
+  const ForgotPasswordScreen({Key? key}) : super(key: key);
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<ForgotPasswordScreen> createState() => _ForgotPasswordScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
-  bool isSelect = true;
+class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   final TextEditingController emailController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
-  late LoginRes _loginRes;
-
   final key = GlobalKey<FormState>();
+  late ForgotPassModel _forgotPassModel;
 
   @override
   Widget build(BuildContext context) {
@@ -50,10 +44,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     child: Column(
                       children: [
                         Padding(
-                          padding: const EdgeInsets.only(top: 18.0),
+                          padding: const EdgeInsets.only(top: 29.0),
                           child: Center(
                             child: Text(
-                              "Login Account",
+                              "Forgot Password",
                               style: TextStyle(
                                   fontSize: 20,
                                   color: Colors.black,
@@ -62,10 +56,11 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
                         Padding(
-                          padding: const EdgeInsets.only(top: 10.0),
+                          padding: const EdgeInsets.only(
+                              top: 10.0, left: 40, right: 30),
                           child: Center(
                             child: Text(
-                              "Discover your social & try to login",
+                              "Please enter your Email to reset your Password",
                               style: TextStyle(
                                   fontSize: 16,
                                   color: Colors.black,
@@ -77,9 +72,9 @@ class _LoginScreenState extends State<LoginScreen> {
                           padding: const EdgeInsets.only(top: 28.0, bottom: 20),
                           child: Center(
                             child: Image.asset(
-                              "assets/images/rebusel_image.jpeg",
+                              "assets/images/forgot_pass.png",
                               fit: BoxFit.contain,
-                              height: 40,
+                              height: 100,
                             ),
                           ),
                         ),
@@ -120,98 +115,68 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
                         // SizedBox(height: 15,),
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(20.0),
-                          child: Padding(
-                            padding: const EdgeInsets.only(
-                                left: 18.0, right: 18, top: 14),
-                            child: Card(
-                              //    margin: EdgeInsets.all(5),
 
-                              elevation: 3,
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(20.0),
-                                child: TextFormField(
-                                  controller: passwordController,
-                                  validator: (val) {
-                                    if (val!.isEmpty) {
-                                      return "Please enter your password";
-                                    } else {
-                                      return null;
-                                    }
-                                  },
-                                  decoration: InputDecoration(
-                                    prefixIcon: Icon(Icons.lock_open),
-                                    hintText: "Password",
-                                    contentPadding: EdgeInsets.only(
-                                        top: 13, left: 12, bottom: 12),
-                                    fillColor: Colors.white,
-                                    filled: true,
-                                    focusColor: Colors.white,
-                                    // focusedBorder: InputBorder.none,
-                                    border: InputBorder.none,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
+                        SizedBox(
+                          height: 40,
                         ),
+
                         Row(
                           children: [
                             Padding(
-                              padding: const EdgeInsets.only(left: 8.0),
-                              child: Row(
-                                children: [
-                                  Checkbox(
-                                      value: isSelect,
-                                      onChanged: (val) {
-                                        setState(() {
-                                          isSelect = val!;
-                                        });
-                                      }),
-                                  Text("Remember Me"),
-                                ],
+                              padding:
+                                  const EdgeInsets.only(left: 18.0, top: 10),
+                              child: Text(
+                                "Password reset Link",
+                                style: TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.w400),
                               ),
                             ),
                             Spacer(),
                             Padding(
                               padding: const EdgeInsets.only(right: 18.0),
-                              child: InkWell(
+                              child: GestureDetector(
                                 onTap: () {
-                                  Navigator.push(context, MaterialPageRoute(builder: (_)=> ForgotPasswordScreen()));
+                                  if (key.currentState!.validate()) {
+                                    checkAPI();
+                                  }
                                 },
-                                child: Text("Forgot Password"),
+                                child: Center(
+                                  child: Container(
+                                    alignment: Alignment.center,
+                                    height: 35,
+                                    width: 100,
+                                    decoration: BoxDecoration(
+                                      color: HexColor("#29AAE1"),
+                                      borderRadius: BorderRadius.circular(15.0),
+                                    ),
+                                    child: Icon(
+                                      Icons.arrow_forward,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
                               ),
-                            ),
+                            )
                           ],
                         ),
-                        SizedBox(
-                          height: 40,
-                        ),
 
-                        GestureDetector(
-                          onTap: () {
-                            if (key.currentState!.validate()) {
-                              checkAPI();
-                            }
+                        InkWell(
+                          onTap: (){
+                            Navigator.pop(context,true);
                           },
-                          child: Center(
-                            child: Container(
-                              alignment: Alignment.center,
-                              height: 45,
-                              width: 200,
-                              decoration: BoxDecoration(
-                                color: HexColor("#29AAE1"),
-                                borderRadius: BorderRadius.circular(15.0),
-                              ),
-                              child: Text(
-                                "Login",
-                                style: TextStyle(
-                                    fontSize: 15, color: Colors.white),
-                              ),
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: 1.0, top: 50),
+                            child: Text(
+                              "Back to Login",
+                              style: TextStyle(
+                                  fontSize: 18,
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.w400),
                             ),
                           ),
-                        )
+                        ),
                       ],
                     ),
                   ),
@@ -223,17 +188,15 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
     );
   }
-
   Future<dynamic> checkAPI() async {
     EasyLoading.show(maskType: EasyLoadingMaskType.clear);
     Map<String, dynamic> jsonMap = {
       'email': "${emailController.text}",
-      "password": "${passwordController.text}"
     };
 
     try {
       final response = await http.post(
-        Uri.parse("http://v2.rebusel.com/api/v1/login"),
+        Uri.parse("http://v2.rebusel.com/api/v1/forgot-password"),
         headers: {
           "Accept": "application/json",
         },
@@ -242,23 +205,38 @@ class _LoginScreenState extends State<LoginScreen> {
       );
 
       EasyLoading.dismiss();
-      _loginRes = loginResFromJson(response.body);
+      _forgotPassModel = forgotPassModelFromJson(response.body);
 
       if (response.statusCode == 200) {
-        if (_loginRes.status == 200) {
-          MyPrefs.setToken(_loginRes.user!.apiToken.toString());
-          Fluttertoast.showToast(
-              msg: "Login Successfully",
-              toastLength: Toast.LENGTH_SHORT,
-              gravity: ToastGravity.CENTER,
-              timeInSecForIosWeb: 1,
-              backgroundColor: Colors.red,
-              textColor: Colors.white,
-              fontSize: 16.0);
-          Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => ChatScreen(),
-          ));
-        } else if (_loginRes.status == 400) {
+        if (_forgotPassModel.status == 200) {
+          Get.defaultDialog(
+              title: "Password reset link send",
+              content: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Center(
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 18.0),
+                        child: Text("We have e-mailed your password reset link!"),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 0.0),
+                      child: Center(
+                        child: ElevatedButton(
+                            onPressed: () {
+                              Get.off(LoginScreen());
+                            },
+                            child: Text("OK")),
+                      ),
+                    ),
+                  ],
+                ),
+              ));
+
+        } else if (_forgotPassModel.status == 400) {
           var error = json.decode(response.body);
 
           print("ERROR___${error['errors']['email'][0]}");
@@ -299,23 +277,24 @@ class _LoginScreenState extends State<LoginScreen> {
           //     textColor: Colors.white,
           //     fontSize: 16.0);
         }
-      } else if (_loginRes.status == 400) {
+      } else if (_forgotPassModel.status == 400) {
         var error = json.decode(response.body);
 
         print("ERROR___${error['errors']['email'][0]}");
 
-        Fluttertoast.showToast(
-            msg: "${error['errors']['email'][0]}",
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.CENTER,
-            timeInSecForIosWeb: 1,
-            backgroundColor: Colors.red,
-            textColor: Colors.white,
-            fontSize: 16.0);
+        // Fluttertoast.showToast(
+        //     msg: "${error['errors']['email'][0]}",
+        //     toastLength: Toast.LENGTH_SHORT,
+        //     gravity: ToastGravity.CENTER,
+        //     timeInSecForIosWeb: 1,
+        //     backgroundColor: Colors.red,
+        //     textColor: Colors.white,
+        //     fontSize: 16.0);
       }
       print(response.body);
     } on SocketException {
       EasyLoading.dismiss();
     }
   }
+
 }

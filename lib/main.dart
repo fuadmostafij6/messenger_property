@@ -1,23 +1,61 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:get/get.dart';
+import 'package:rebusel/screen/chat_screen.dart';
 import 'package:rebusel/screen/introduction_page.dart';
+import 'package:rebusel/utils/my_pref.dart';
 
 void main() {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+void configLoading() {
+  EasyLoading.instance
+    ..displayDuration = const Duration(milliseconds: 2000)
+    ..indicatorType = EasyLoadingIndicatorType.ring
+    ..loadingStyle = EasyLoadingStyle.dark
+    ..indicatorSize = 30.0
+    ..radius = 5.0
+    ..progressColor = Colors.white
+    ..backgroundColor = Colors.deepOrange
+    ..indicatorColor = Colors.white
+    ..textColor = Colors.white
+    ..maskColor = Colors.blue.withOpacity(0.5)
+    ..userInteractions = false;
+}
+class MyApp extends StatefulWidget {
   const MyApp({Key? key}) : super(key: key);
 
-  // This widget is the root of your application.
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  String ? token;
+  @override
+  void initState() {
+
+
+    MyPrefs.getToken().then((value) {
+      setState(() {
+
+        token = value;
+
+      });
+    });
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return GetMaterialApp(
       debugShowCheckedModeBanner: false,
+      builder: EasyLoading.init(),
       title: 'Flutter Demo',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const IntroDuctionScreen(),
+      home: token=="" ? const IntroDuctionScreen() : const ChatScreen(),
     );
   }
 }
